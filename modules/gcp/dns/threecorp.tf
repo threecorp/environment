@@ -3,7 +3,7 @@ locals {
 }
 
 resource "google_dns_managed_zone" "threecorp" {
-  name         = "${replace(local.domain, ".", "-")}"
+  name         = "threecorp-jp"
   dns_name     = "${local.domain}."
 }
 
@@ -22,14 +22,37 @@ resource "google_dns_record_set" "threecorp_mx" {
   ]
 }
 
-# resource "google_dns_record_set" "threecorp_spf" {
-#   managed_zone = "${google_dns_managed_zone.threecorp.name}"
-#   name         = "${google_dns_managed_zone.threecorp.dns_name}"
+resource "google_dns_record_set" "threecorp_github_verification" {
+  managed_zone = "${google_dns_managed_zone.threecorp.name}"
+  name         = "_github-challenge-threecorp.${google_dns_managed_zone.threecorp.dns_name}"
 
-#   type         = "TXT"
-#   ttl          = 3600
-#   rrdatas      = ["\"v=spf1 include:_spf.google.com ~all\""]
-# }
+  type         = "TXT"
+  ttl          = 3600
+  rrdatas      = ["\"12b3c89376\""]
+}
+
+resource "google_dns_record_set" "threecorp_github_page" {
+  managed_zone = "${google_dns_managed_zone.threecorp.name}"
+  name         = "${google_dns_managed_zone.threecorp.dns_name}"
+
+  type         = "A"
+  ttl          = 3600
+  rrdatas      = [
+    "185.199.108.153",
+    "185.199.109.153",
+    "185.199.110.153",
+    "185.199.111.153",
+  ]
+}
+
+resource "google_dns_record_set" "threecorp_spf" {
+  managed_zone = "${google_dns_managed_zone.threecorp.name}"
+  name         = "${google_dns_managed_zone.threecorp.dns_name}"
+
+  type         = "TXT"
+  ttl          = 3600
+  rrdatas      = ["\"v=spf1 include:_spf.google.com ~all\""]
+}
 
 # resource "google_dns_record_set" "threecorp_dkim" {
 #   managed_zone = "${google_dns_managed_zone.threecorp.name}"
@@ -42,13 +65,13 @@ resource "google_dns_record_set" "threecorp_mx" {
 #   ]
 # }
 
-# resource "google_dns_record_set" "threecorp_dmarc" {
-#   managed_zone = "${google_dns_managed_zone.threecorp.name}"
-#   name         = "_dmarc.${google_dns_managed_zone.threecorp.dns_name}"
+resource "google_dns_record_set" "threecorp_dmarc" {
+  managed_zone = "${google_dns_managed_zone.threecorp.name}"
+  name         = "_dmarc.${google_dns_managed_zone.threecorp.dns_name}"
 
-#   type         = "TXT"
-#   ttl          = 3600
-#   rrdatas      = [
-#     "\"v=DMARC1; p=reject; rua=mailto:reports@${local.domain}\""
-#   ]
-# }
+  type         = "TXT"
+  ttl          = 3600
+  rrdatas      = [
+    "\"v=DMARC1; p=reject; rua=mailto:reports@${local.domain}\""
+  ]
+}
